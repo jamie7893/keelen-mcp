@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.1.0/plugin.schema.json",
+  "name": "keelen",
+  "version": "1.0.0",
+  "description": "An autonomous coding loop: it plans tasks from your roadmap, writes code in isolated VMs on your own Claude, Codex, GLM, or Kimi key, and ships tested PRs.",
+  "author": {
+    "name": "Keelen",
+    "url": "https://keelen.ai/"
+  },
+  "homepage": "https://keelen.ai/",
+  "repository": "https://github.com/jamie7893/keelen-mcp",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "ai-agents",
+    "autonomous-agents",
+    "developer-tools",
+    "claude",
+    "codex"
+  ]
+}
