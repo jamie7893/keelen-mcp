@@ -1,6 +1,6 @@
 # Keelen MCP tools
 
-Full reference for all 40 tools exposed by `https://keelen.ai/mcp`. Most
+Full reference for all 41 tools exposed by `https://keelen.ai/mcp`. Most
 tool responses include `next_action` (and usually `next_step`) — follow it;
 polling loops are your responsibility, the server does not push updates.
 
@@ -98,6 +98,17 @@ Reports where onboarding stands — `engine_connected`, `github_connected`,
 incomplete step, and `done` once onboarding is finished. Loop this between
 every onboarding step until `step` reports `"done"`.
 
+The engine connection step has the legacy name `claude` for all five
+supported engines: Claude Code, Codex, GLM, Kimi, and Grok. At that step,
+`next_tool` is `open_dashboard`; call it to obtain the `login_url` for the
+user. `get_onboarding_status` itself does not return a dashboard login link.
+The project selection steps are `repo` and `configure`; their `next_tool`
+is `list_github_repos`, after which the user chooses import or creation.
+
+`engine_connected` means a credential is stored for at least one supported
+engine. It is a presence flag, not a live provider health check; an expired
+sign-in can still require reconnection in the dashboard.
+
 `github_connected` is a PRESENCE flag: it says a GitHub connection was made for
 this workspace, not that the loop can read a given repository right now. A
 connection can be present while a lane fails every read (the app was removed
@@ -126,9 +137,23 @@ workspace owner. Because this server already authenticated the owner, the
 returned `login_url` (a `/login?token=…` deep link) signs the user straight
 into the dashboard — no email round-trip, no password — and lands them where
 onboarding left off (the engine-connect screen when that's the current step).
-Use it whenever the user needs the dashboard: connecting an engine
-subscription, updating a billing card, or opening a project page. The link is
+Use it whenever the user needs the dashboard: connecting an engine,
+updating a billing card, or opening a project page. The link is
 single-use and expires in 15 minutes — call it again for a fresh one.
+
+The dashboard supports these engine connection methods:
+
+| Engine | Connection methods |
+| --- | --- |
+| Claude Code | Claude Pro/Max subscription token or Anthropic API key |
+| Codex | ChatGPT subscription sign-in via an `auth.json` upload, or OpenAI API key |
+| GLM | Z.ai API key |
+| Kimi | Kimi Code membership key or Moonshot Open Platform key |
+| Grok | SuperGrok sign-in via an `auth.json` upload, or xAI API key |
+
+The user connects these credentials only in the dashboard. Never ask for
+them in chat or pass them to an MCP tool. Connecting the Grok coding engine
+does not connect a Grok Bot MCP client.
 
 **Auth:** Bearer token.
 
@@ -158,9 +183,15 @@ isn't connected yet — call `connect_github()` first.
 ### `import_project`
 
 **Params:** `repo_full_name: str`, `engine: str | None` (`claude_code` |
-`codex` | `glm` | `kimi` | `grok`, default `claude_code`),
+`codex` | `glm` | `kimi` | `grok`; omitted means automatic selection),
 `build_description: str | None`, `project_kind: str | None`, `stack: str |
 None`, `preview_command: str | None`
+
+When `engine` is omitted, Keelen selects from the workspace's connected
+engines in this order: Claude Code, Codex, GLM, Kimi, then Grok. If none is
+connected, it falls back to Claude Code. Pass `engine` explicitly to choose
+among multiple connections. This selection uses credential presence, not a
+live provider health check; a selected engine can still need reconnection.
 
 Connects an existing GitHub repository (must be visible via
 `list_github_repos`) as a Keelen project. This is the counterpart of
@@ -214,10 +245,10 @@ failed. Poll roughly every 10 seconds until `overall` is `"ready"`.
 **Params:** `plan: str` (`starter` | `pro` | `agency`, default `starter`)
 
 Reports billing status and, when the workspace needs a new subscription,
-returns a Stripe `checkout_url` — send it to the user to open in a browser
-(the one setup step that can't happen in chat). Compute unlocks
-automatically once payment completes; you don't need to block on it. If a
-past payment failed (`payment_status` is `past_due`), this returns no
+returns a Stripe `checkout_url`: send it to the user to open in a browser.
+After payment, follow `get_onboarding_status`. A project created with its
+loop off still needs `control_scheduler(project_id, "enable")` to start
+work. If a past payment failed (`payment_status` is `past_due`), this returns no
 checkout link — the fix is to update the card on the dashboard billing page,
 not to start a new subscription.
 
@@ -241,6 +272,10 @@ this listing never re-acts on a project it already removed.
 `private: bool` (default `true`), `preview_command: str | None`,
 `org: str | None`, `engine: str | None`, `ci_runs_on: list[str] | None`,
 `framework: str | None`
+
+`engine` accepts `claude_code`, `codex`, `glm`, `kimi`, or `grok`. When
+omitted, it uses the same connected-engine selection as
+[`import_project`](#import_project).
 
 Scaffolds a brand-new GitHub repository from scratch, creates a bootstrap
 Keelen project for it, and submits `build_description` as the project's
@@ -312,6 +347,12 @@ call — which enters the PM intake pipeline exactly like a web-submitted
 request. Split a multi-feature ask into separate calls. Poll
 `get_request_status` with the returned `thread_id`.
 
+Placement: intake puts every new roadmap item at the BACK of the queue, behind
+every queued item. Parked or capped items ahead of it are skipped by the
+expand picker and do not delay it. If the new work must run before other
+electable items, call `reorder_roadmap` after intake finishes;
+`get_request_status` reports where each item landed.
+
 **Auth:** Bearer token.
 
 ### `get_request_status`
@@ -339,6 +380,21 @@ them — that is normal, and `intake_next_eligible_at` is the moment to expect i
 `control_scheduler(project_id, "process_now")` durably prioritizes the project
 and immediately attempts the batch. It reports a typed gate instead of claiming
 that a blocked batch will start.
+
+When `next_action` is `done` and the request produced roadmap items, the
+response carries `roadmap_placement`, one entry per item that is still queued,
+and `next_step` says the same in a sentence:
+
+| Field | Meaning |
+|---|---|
+| `queue_position` / `queued_total` | the item's 1-based position in the expand queue |
+| `queued_ahead` | how many queued items sit ahead of it |
+| `electable_ahead` | how many of those the expand picker would actually elect first — parked, capped, cooling and intake-pending items are skipped and do not count |
+| `electable` / `skip_reason` | whether the picker would elect this item now, and if not why (see `list_roadmap`) |
+
+`electable_ahead: 0` means the item is next to expand and no reorder is
+needed. A positive value means `reorder_roadmap` is required if it must run
+before those items.
 
 **Auth:** Bearer token.
 
@@ -421,6 +477,13 @@ recorded.
 
 Lists a project's roadmap items filtered by status.
 
+Queued rows also carry `electable` and `skip_reason`. `electable` is the expand
+picker's own answer to "would this item be elected now"; a skipped item ahead
+of yours does not delay it. `skip_reason` is one of `crash_capped`,
+`noop_capped`, `crash_cooldown`, `noop_cooldown`, `awaiting_intake_thread`
+(its request has not finished intake), `held_on_open_pr`, or `other` (a fresh
+spawn claim, an already-shipped guard, or an open clarification ask).
+
 **Auth:** Bearer token.
 
 ### `reorder_roadmap`
@@ -431,6 +494,14 @@ Reprioritizes a project's queued roadmap items to a new front-to-back order
 (the first id becomes the highest priority — expanded into tasks next).
 Items pinned to a specific point in time still dominate regardless of
 position in `ordered_ids`; unknown or no-longer-queued ids are skipped.
+
+The response says whether the requested order actually holds:
+`order_honoured` is `false` when a horizon pin overrode it, and
+`pin_overrides` lists each pinned item that won — `{id, title, horizon_pin,
+requested_position, actual_position}` — while `next_step` names it, names the
+requested head it displaced, and points at `clear_horizon_pin`. Read
+`order_honoured`, not `updated`: `updated` counts the rows written, not
+whether the order you asked for is the order the loop will use.
 
 **Auth:** Bearer token.
 
@@ -473,8 +544,26 @@ history (acceptance criteria, QA steps, iterations); nothing is deleted.
 `reason` is required and is recorded on the audit trail. Pass
 `superseded_by_pr_number` or `superseded_by_task_id` when the work was really
 delivered elsewhere — that records verified provenance instead of a bare
-abandon. A close never claims the content reached the default branch, so any
-task that declared a dependency on this one keeps waiting.
+abandon.
+
+What the close means for tasks that declared a dependency on this one:
+
+- A task already recorded as merged stays delivered; closing it afterwards
+  does not take that away from its dependents.
+- `superseded_by_pr_number` is checked against GitHub before anything is
+  written. A merged PR releases the dependents. A PR that is missing, open, or
+  closed without merging is refused with 422; if GitHub cannot be reached the
+  close is refused with 409 and you retry. Nothing is closed in either case.
+- `superseded_by_task_id` moves the dependents onto that task, so they wait on
+  the work that actually delivers.
+- A plain close with neither keeps them waiting: closing a ticket does not put
+  its content on the default branch.
+
+The response carries `superseding_pr_verified` (`true` after a confirmed
+merge, `null` when no PR was given), `dependents` — one
+`{task_id, title, status, dependency_met, dev_ready}` per task that depended
+on this one — plus `dependents_released` / `dependents_held`, and `next_step`
+names them and says why any are still waiting.
 
 Returns 409 while a running iteration holds the task (stop the machine first),
 and 404 for a task outside the caller's workspace. Idempotent: closing an
@@ -513,12 +602,34 @@ Reports a project's open task count, iterations run today, `prs_merged_today`,
 escalation count, pause state, and activity freshness — a quick health
 snapshot for the loop.
 
+**`queued_roadmap_items`** counts this project's roadmap items with status
+`queued`, separately from `open_tasks`. A project can have zero open tasks
+and still have planned work waiting for expansion, especially when autonomous
+scheduling is disabled. This count includes queued items held by planning
+gates; it is not a count of immediately runnable work. Use `list_roadmap` for
+their titles, ordering and eligibility. If this optional count is absent,
+roadmap size is unknown rather than zero.
+
 **`prs_merged_today`** is the DELIVERY signal: the number of distinct pull
 requests whose merge landed today (UTC). Tasks that share one pull request
 collapse to a single count. One caveat: the merge timestamp this counts is only
 stamped for projects on the automatic merge policy. On `manual_merge` or
 `branch_only` the field reads 0 even while the project's pull requests are
 being merged by hand — read the repository, not this number, for those.
+
+**`deployment`** keeps merging, deploying and verifying apart. It is
+`{merged, deployed, verified, last_deploy_attempt, legacy_last_successful_deploy_at,
+legacy_provenance}`: `merged` is the newest confirmed merge, `deployed` the
+newest deploy a deployment system reported as successful, `verified` the newest
+deployment the server corroborated (the revision is a confirmed merge of this
+project and the environment's current deployment record still names it), and
+`last_deploy_attempt` the newest deploy observation of any outcome, so a failed
+deploy after a success is visible. Each fact carries its `revision`,
+`environment`, `source`, `outcome`, `occurred_at` and `observed_at`. Treat only
+`verified` as a verified deployment. `last_successful_deploy_at` is the LEGACY
+pointer this replaces: a `legacy_provenance` of `legacy_unknown` means the value
+was written when merges and deployments shared one timestamp, so it may be a
+merge instant — never read it as a deployment.
 
 **`ui_review`** (`web_app` projects only) is `{scenarios, scenario_cap,
 captures, capture_cap}` — the default-branch `ui-review.json` manifest's
@@ -554,6 +665,15 @@ Also carries `intake_lane_reason` and `intake_next_eligible_at` (same values as
 [`get_request_status`](#get_request_status)). A lane held by a timed gate sets
 no pause field and lets `last_iter_at` go stale, so without these a normal
 debounce looks identical to a stall.
+
+**`scheduler_paused_until_kind`** and **`pause_resolves_when`** sit beside the
+pause state. A dead credential, an error streak, or a manual pause is held
+with a far-future sentinel (`9999-01-01`) because it has no timed self-resume;
+that reads as permanent, so the kind says which it is — `until_you_act`,
+`timed`, `elapsed`, or `null` with no pause — and `pause_resolves_when` states
+the fix in one line (for a credential pause: reconnect it in Settings; the
+codex, grok and glm reconnects resume the project themselves). The same two
+fields ride on `control_scheduler`'s state echo.
 
 **Auth:** Bearer token.
 
@@ -622,6 +742,28 @@ operator-approved plan section, the same task lineage is requeued, and only
 then is the escalation resolved. `raise_project_cap` requires a project-only
 cap from 6 through 24; this never loosens the fleet-wide screenshot limit.
 Repeated calls are no-ops after the first committed decision.
+
+**Auth:** Bearer token.
+
+### `set_ui_review_scenario_cap`
+
+**Params:** `project_id: str`, optional `scenario_cap: int`
+
+Sets a `web_app` project's ui-review scenario budget, or resets it to the
+platform default of 12 when `scenario_cap` is null. Accepts 6 through 24. The
+screenshot cap derives from the scenario cap and moves with it, so the two
+cannot starve each other.
+
+Raising always succeeds, including from a completely full manifest. Lowering is
+refused when the default branch already declares more scenarios or screenshots
+than the smaller budget allows, and refused when that manifest cannot be read.
+Both caps are enforced when keelen pushes, not in your CI, so a manifest left
+over cap fails every push while CI stays green.
+
+Read `project_status.ui_review` for the live occupancy before calling. Repeated
+calls with the same value change nothing. Iterations already running keep the
+budget they started with. If your repository asserts these numbers in its own
+tests, update that assertion in the same change.
 
 **Auth:** Bearer token.
 
@@ -708,7 +850,7 @@ This tool returns `next_action: "wait"` with **no** `poll_after_seconds` —
 there is no MCP tool that reports review progress. Tell the user the review
 started, then read the findings later; do not loop.
 
-Rate-limited: **4 calls per hour per workspace**. Past the limit you get the
+Rate-limited: **12 calls per hour per workspace**. Past the limit you get the
 same `next_action: "wait"` shape, but with `ok: false` and no review started.
 Read `next_step` to tell the two apart.
 

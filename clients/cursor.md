@@ -7,14 +7,15 @@
 Cursor's exact MCP configuration UI/schema can change between versions; the
 shape below is the standard HTTP-MCP JSON. If your Cursor version's settings
 UI or file format looks different, consult [Cursor's own MCP
-docs](https://docs.cursor.com/) for the current exact location and schema —
+docs](https://cursor.com/docs/mcp) for the current exact location and schema:
 the URL, transport, and header shown here will still be correct even if
 where you put them differs.
 
 ## Add the server (tokenless)
 
-Add to your Cursor MCP config (typically `~/.cursor/mcp.json` for a global
-config, or `.cursor/mcp.json` in a project for a project-scoped one):
+Add to the global Cursor MCP config, `~/.cursor/mcp.json` in your home
+directory. Use this location so the bearer key added later stays outside
+your repository:
 
 ```json
 {
@@ -31,6 +32,9 @@ to drive the whole flow from chat.
 
 ## Add the server (with a bearer key already in hand)
 
+Save this entry in the global `~/.cursor/mcp.json` only. Never save the key
+in a repository, including a gitignored project config.
+
 ```json
 {
   "mcpServers": {
@@ -46,15 +50,18 @@ to drive the whole flow from chat.
 
 ## Where the config lives
 
-`~/.cursor/mcp.json` (global) or `.cursor/mcp.json` at your project root
-(project-scoped) — confirm the exact path for your Cursor version in
-Cursor's MCP settings panel, which can also generate/edit this file for you.
+Use `~/.cursor/mcp.json` in your home directory for the authenticated Keelen
+connection. Cursor also supports a project file at `.cursor/mcp.json`, but
+do not put a Keelen bearer key there. If you already added a tokenless
+project entry, remove that entry when moving the connection to the global
+config. Preserve any unrelated server entries in both files.
 
 ## Updating the header after `verify_email`
 
-Edit the `headers.Authorization` value in `mcp.json` to `Bearer <api_key>`,
-save, and reconnect the server from Cursor's MCP settings panel (or restart
-Cursor if no explicit reconnect option is available).
+Edit the `headers.Authorization` value in the global `~/.cursor/mcp.json`
+to `Bearer <api_key>`, save, and reconnect the server from Cursor's MCP
+settings panel (or restart Cursor if no explicit reconnect option is
+available).
 
 ## Troubleshooting
 

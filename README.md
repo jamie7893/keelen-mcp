@@ -1,50 +1,85 @@
 # keelen-mcp
 
-**Onboard an autonomous dev team from your chat window: in one sentence.**
+**Steer Keelen, the AI coding agent for GitHub, from your chat.**
 
-![Keelen set-me-up demo: register the MCP server, say "set me up", and the loop ships a merged, tested pull request](keelen-setmeup.gif)
+Build apps and internal tools, or keep a defined backlog moving with the
+approval and merge controls you choose. Keelen turns requests into a standing
+roadmap, plans tasks, runs checks and opens pull requests in your repository.
 
-Paste [SETUP.md](SETUP.md) into Claude (or any MCP-capable agent) and say
-**"set me up."** Your agent creates the account, connects your GitHub repo,
-and submits the first build request. From then on, a bounded PM → dev →
-verify loop turns plain-English requests into **tested, merged pull
-requests**, and you steer all of it from chat.
+Paste [SETUP.md](SETUP.md) into a compatible MCP client and say **"set me up."**
+Your agent guides account setup and project creation. You confirm your email
+and complete AI credential connection, GitHub approval and any billing steps
+in the browser. Once connected, use chat to submit requests, set priorities
+and answer questions about the work.
 
-No dashboard required to drive it. No tokens resold: the loop runs on
-**your own** [Claude, Codex, GLM, or Kimi
-key](https://keelen.ai/mcp-server/?utm_source=mcp-server&utm_medium=github-readme&utm_campaign=readme).
-Every change passes your tests and CI before it can merge.
+Use your own supported **AI subscription or API key** with Claude Code,
+Codex, GLM, Kimi or Grok. Keelen adds no markup to AI usage.
+[See how the MCP workflow works](https://keelen.ai/mcp-server/?utm_source=mcp-server&utm_medium=github-readme&utm_campaign=readme).
 
 This repo is documentation only. It describes the hosted [Model Context
 Protocol](https://modelcontextprotocol.io) (MCP) server at
-`https://keelen.ai/mcp` and how to drive the entire signup → connect →
-ship flow without ever leaving your agent.
+`https://keelen.ai/mcp`. Keelen runs the coding workflow as a hosted service;
+this repository contains its documentation and client configuration examples.
 
-## What Keelen does
+![Recorded Keelen MCP setup walkthrough](keelen-setmeup.gif)
 
-Keelen is **loop engineering as a managed service.** You describe what you want
-built and steer from chat; a bounded, continuous PM → dev → QA loop does the
-rest. Against your GitHub repo it turns your requests into roadmap items and
-tasks, writes the code, opens pull requests, runs your tests, and reports
-back — all while you keep steering from a chat window (yours, or your agent's).
+The recording shows an earlier setup flow. Follow the current instructions
+below for account verification and browser approvals.
 
-Every change is **verified before it lands.** Keelen gates each pull request on
-*your* test suite and CI — not the agent's own opinion of its work — and holds
-anything that fails for automatic rework instead of merging it.
+## Work you can hand over
 
-## Set up in 60 seconds
+- Build an app or progress the fixes, tests and small features on a solo
+  project's roadmap.
+- Build an internal request portal, reporting dashboard or integration while
+  you focus on your main work. Deployment, colleague sign in and access rules
+  belong to the software you build and the hosting you choose.
+- Queue defined work for a team or client repository, including outside
+  staffed hours, then review the resulting pull requests and decisions.
+- Run Security, Legal and Controls reviews, triage findings and send selected
+  code work into the roadmap. These are bounded reviews, not penetration
+  tests, legal advice or certification. Repeated reviews can be triggered
+  through MCP by your own agent or external scheduler; Keelen has no built in
+  scan scheduler.
 
-**Claude Code** — connect the server tokenless, then hand your agent the
-setup script:
+These are example uses, not customer deployments or ready made templates.
+You set priorities and choose plan approval, manual merge or other supported
+controls for each project. Keelen checks changes before they can merge and
+holds failed checks. Capacity, provider limits, missing information and
+decisions can pause progress; a queue is not a promise of finished work by a
+particular time.
+
+## AI engines and credentials
+
+Connect credentials in the Keelen dashboard, never in the MCP chat. The
+workspace API key used by your MCP client is separate from these credentials.
+
+| AI engine | Supported connection |
+| --- | --- |
+| Claude Code | Claude Pro or Max sign in, or an Anthropic API key |
+| Codex | ChatGPT sign in, or an OpenAI API key |
+| GLM | Z.ai API key |
+| Kimi | Kimi Code membership key or Moonshot Open Platform API key |
+| Grok | SuperGrok sign in or xAI API key |
+
+Engine availability can differ by role. Grok here means the coding engine;
+it does not establish Grok Bot compatibility as an MCP client. OpenRouter
+is currently limited to Keelen's own test and benchmark projects and is not
+enabled for customer repositories.
+
+## Connect and set up
+
+For Claude Code, connect the server without a token, then hand your agent
+the setup instructions:
 
 ```
 claude mcp add --transport http keelen https://keelen.ai/mcp
 ```
 
 Then paste the contents of [`SETUP.md`](SETUP.md) into your agent and say
-**"set me up"**. It will ask for your email, ask for the 6-digit code that
-lands in your inbox, and take it from there — engine connect, GitHub
-connect, first project, and provisioning, end to end.
+**"set me up"**. It will ask for your email and the verification code that
+lands in your inbox. It then guides you through connecting an AI engine,
+approving GitHub access, creating or importing a project, and provisioning.
+Follow the dashboard links for the steps that require your browser.
 
 The whole flow on one page, with the 50-second demo:
 <https://keelen.ai/mcp-server/?utm_source=mcp-server&utm_medium=github-readme&utm_campaign=setup>
@@ -64,7 +99,7 @@ animated characters from plain-language requests — see
 
 ## Tools (abbreviated)
 
-The server exposes 40 tools. Two work with no key at all (`signup`,
+The server exposes 41 tools. Two work with no key at all (`signup`,
 `verify_email`); the rest need the bearer key `verify_email` gives you. Full
 reference with parameters and behavior: [`TOOLS.md`](TOOLS.md).
 
@@ -72,13 +107,17 @@ reference with parameters and behavior: [`TOOLS.md`](TOOLS.md).
 | --- | --- |
 | Getting started | `signup`, `verify_email` |
 | Onboarding | `get_onboarding_status`, `open_dashboard`, `connect_github`, `list_github_repos`, `import_project`, `get_provisioning_status`, `get_billing` |
-| Projects & roadmap | `list_projects`, `create_project`, `archive_project`, `delete_project`, `submit_request`, `get_request_status`, `answer_request`, `refine_request`, `set_product_vision`, `set_product_goal`, `get_product_vision`, `get_product_goal`, `list_roadmap`, `reorder_roadmap`, `cancel_roadmap_item`, `clear_horizon_pin`, `project_status`, `list_escalations`, `resolve_escalation`, `retry_blocked_task`, `rearm_roadmap_item`, `resolve_platform_policy_conflict`, `replan_task`, `close_task`, `control_scheduler` |
-| Other | `run_security_review`, `rollback_roblox_place` |
+| Projects & roadmap | `list_projects`, `create_project`, `archive_project`, `delete_project`, `submit_request`, `get_request_status`, `answer_request`, `refine_request`, `set_product_vision`, `set_product_goal`, `get_product_vision`, `get_product_goal`, `list_roadmap`, `reorder_roadmap`, `cancel_roadmap_item`, `clear_horizon_pin`, `project_status`, `list_escalations`, `resolve_escalation`, `retry_blocked_task`, `rearm_roadmap_item`, `resolve_platform_policy_conflict`, `replan_task`, `close_task`, `control_scheduler`, `set_ui_review_scenario_cap`, `rollback_roblox_place` |
+| Reviews | `run_security_review`, `run_legal_exposure_review`, `get_legal_exposure_findings`, `run_control_gap_review`, `get_control_gap_findings` |
 
 The server speaks MCP protocol revision `2026-07-28` as well as the earlier
 handshake revisions, from the same endpoint — no client action is required
 either way. Details in [`clients/generic.md`](clients/generic.md#protocol-support);
 notable contract changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
+
+[`PORTFOLIO.md`](PORTFOLIO.md) documents the separate portfolio surface,
+which is not generally available. Its scoped OAuth interface is distinct
+from the primary MCP server described here.
 
 ## FAQ
 
@@ -92,7 +131,8 @@ runs inside an isolated per-tenant sandbox scoped to your own workspace.
 are all free. Actually running the autonomous loop (compute) requires an
 active subscription — `get_billing()` returns a Stripe checkout link the
 moment you're ready. A free/unpaid workspace can do everything up through
-project creation and provisioning; iterations start once billing is active.
+project creation. Work can start once billing is active,
+the project's loop is enabled and its setup requirements are satisfied.
 
 **How do I revoke access?** Every key minted through this flow (or the
 dashboard) can be individually revoked. Go to your Keelen dashboard →

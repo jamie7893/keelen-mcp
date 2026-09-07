@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.1.0/plugin.schema.json",
   "name": "keelen",
   "version": "1.0.0",
-  "description": "An autonomous coding loop: it plans tasks from your roadmap, writes code in isolated VMs on your own Claude, Codex, GLM, or Kimi key, and ships tested PRs.",
+  "description": "Steer Keelen's AI coding agent for GitHub through MCP. Build apps and internal tools or progress your backlog with your own AI subscription or API key.",
   "author": {
     "name": "Keelen",
     "url": "https://keelen.ai/"
@@ -17,6 +17,10 @@
     "autonomous-agents",
     "developer-tools",
     "claude",
-    "codex"
+    "codex",
+    "glm",
+    "kimi",
+    "grok",
+    "internal-tools"
   ]
 }
