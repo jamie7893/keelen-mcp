@@ -45,9 +45,10 @@ other than the one the key belongs to.
 - **Tenant-scoped only.** Every tool call is resolved against the bearer
   key's workspace. There is no tool that reads or writes another workspace's
   data.
-- **Your engine credentials never transit MCP.** Claude, Codex, GLM, and Kimi
-  subscription credentials are connected exclusively through the Keelen
-  dashboard (a browser session), never accepted as tool arguments or
+- **Your engine credentials never transit MCP.** Credentials for Claude
+  Code, Codex, GLM, Kimi, and Grok, whether a supported subscription sign-in,
+  token, or API key, are connected exclusively through the Keelen dashboard
+  (a browser session), never accepted as tool arguments or
   returned in tool responses. No MCP tool call can read, set, or forward
   those credentials.
 - **GitHub access is explicit and browser-approved.** `connect_github`
@@ -83,7 +84,7 @@ workspace, to bound runaway agent loops and abuse:
 | --- | --- |
 | `create_project` | 10 calls / hour / workspace |
 | `run_security_review` | 4 calls / hour / workspace |
-| `run_legal_exposure_review` | 4 calls / hour / workspace |
+| `run_legal_exposure_review` | 12 calls / hour / workspace |
 | `run_control_gap_review` | 4 calls / hour / workspace |
 
 Every cap sits well above normal interactive use. Past one, the tool returns

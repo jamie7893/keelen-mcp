@@ -6,6 +6,29 @@ Dates are when the change reached `https://keelen.ai/mcp`. Deprecations name
 the date the old shape is removed; nothing is removed without appearing here
 first.
 
+## 2026-09-03 — the ui-review scenario budget is settable
+
+**What changed.** `set_ui_review_scenario_cap` was added. It sets a `web_app`
+project's ui-review scenario budget, or resets it to the default of 12, without
+requiring an open escalation.
+
+**Why it matters.** The budget had one writer:
+`resolve_platform_policy_conflict` with `raise_project_cap`, which needs an open
+platform-policy card on a blocked task. A project could be repaired but never
+configured, so an operator watching the manifest fill had to wait for a task to
+fail against the cap and spend an iteration producing nothing before the budget
+could move at all.
+
+Raising always succeeds, including from a full manifest. Lowering is refused
+when the default branch already exceeds the smaller budget on either the
+scenario or the screenshot axis, and refused when that manifest cannot be read:
+both caps are enforced at push time and not in your CI, so a manifest left over
+cap fails every push while CI stays green.
+
+**Compatibility.** Additive. `resolve_platform_policy_conflict` is unchanged and
+remains the right call when a platform-policy card is open, because it also
+replans and requeues the blocked task.
+
 ## 2026-08-31 — closed tasks stop counting as open work
 
 **What changed.** `project_status.open_tasks` no longer counts a `cancelled`
