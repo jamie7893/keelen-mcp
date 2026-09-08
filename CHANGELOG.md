@@ -6,6 +6,16 @@ Dates are when the change reached the named hosted MCP surface. Deprecations nam
 the date the old shape is removed; nothing is removed without appearing here
 first.
 
+## Unreleased — Manual recipient setup clarification
+
+The [Portfolio Manager guide](PORTFOLIO-MANAGER.md) separates connecting existing
+projects, checking progress and making a supported goal edit from optional
+blueprint import. It explains GitHub repository selection, the Keelen workspace
+on OAuth consent, recorded decisions versus owner approval cards, and a useful
+follow-up when the attention digest is quiet. The walkthrough used two existing
+fictional projects on an existing owner account; it is not fresh-account
+acceptance. This documentation update does not enable execution or routines.
+
 ## 2026-09-08 — Portfolio Manager 0.3 is available
 
 The [manual recipient guide](PORTFOLIO-MANAGER.md) now describes the accepted
