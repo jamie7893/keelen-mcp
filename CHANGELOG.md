@@ -2,9 +2,25 @@
 
 Notable changes to the Keelen MCP server's public contract. Newest first.
 
-Dates are when the change reached `https://keelen.ai/mcp`. Deprecations name
+Dates are when the change reached the named hosted MCP surface. Deprecations name
 the date the old shape is removed; nothing is removed without appearing here
 first.
+
+## 2026-09-08 — Portfolio Manager 0.3 is available
+
+The [manual recipient guide](PORTFOLIO-MANAGER.md) now describes the accepted
+0.3 template configuration: five generic skills, no scheduled routines,
+recipient-owned accounts and explicit policy 3 consent for selected existing
+public or private projects. Owners review blueprint previews and approve exact
+imports in Keelen Settings. The template share link and public availability are
+confirmed: [open Keelen Portfolio Manager](https://x.ai/bot/iCqviUzbFmWEKAdNqkXKm)
+and follow the guide to connect your own account.
+
+This is the separate `https://keelen.ai/portfolio/mcp` surface. It does not change
+the primary MCP setup or enable the separately merged optional 0.4 delegated
+actions. Those actions require additional owner permission and deployed
+availability; manual management reads use selected-project consent. This entry
+makes no claim of native acceptance for a 0.4 template or routine.
 
 ## 2026-09-03 — the ui-review scenario budget is settable
 

@@ -115,9 +115,14 @@ handshake revisions, from the same endpoint — no client action is required
 either way. Details in [`clients/generic.md`](clients/generic.md#protocol-support);
 notable contract changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
-[`PORTFOLIO.md`](PORTFOLIO.md) documents the separate portfolio surface,
-which is not generally available. Its scoped OAuth interface is distinct
-from the primary MCP server described here.
+[Portfolio Manager 0.3](PORTFOLIO-MANAGER.md) is the manual template for managing
+selected existing public or private projects. Open the
+[published template](https://x.ai/bot/iCqviUzbFmWEKAdNqkXKm) and follow the guide to
+connect your own account. The separate Portfolio OAuth surface is available.
+The [portfolio reference](PORTFOLIO.md) documents its scoped interface and optional
+0.4 management features. Delegated actions require additional owner opt-in and
+are not enabled by copying the manual template; manual management reads use the
+selected-project consent. The primary MCP setup above is unchanged.
 
 ## FAQ
 
