@@ -6,6 +6,21 @@ Dates are when the change reached the named hosted MCP surface. Deprecations nam
 the date the old shape is removed; nothing is removed without appearing here
 first.
 
+## 2026-09-10 — Portfolio Manager 0.4.1 is available
+
+The [published manual template](https://x.ai/bot/gvegGULyBESU9brTeOM_r) and
+[recipient guide](PORTFOLIO-MANAGER.md) now cover submitting distinct Requests,
+checking the selected-project charter and budget, and returning to the same
+work. One eligible project is enough. The five generic `portfolio-v041-*`
+skills include complete instructions and embedded schema; existing 0.3 copies
+are not upgraded automatically. Native template version 1 contains instruction
+package 0.4.1.
+
+The template supplies no connected account, project mapping, memory, routine,
+files or conversation. Each recipient uses their own accounts and consent.
+This publication does not enable project execution or delegated routines, and
+does not establish independent adoption, unattended QA or measured savings.
+
 ## Unreleased — Manual recipient setup clarification
 
 The [Portfolio Manager guide](PORTFOLIO-MANAGER.md) separates connecting existing
