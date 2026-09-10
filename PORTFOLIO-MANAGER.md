@@ -1,16 +1,29 @@
-# Keelen Portfolio Manager 0.3
+# Keelen Portfolio Manager 0.4.1 manual workflow
 
-Manage your public and private Keelen projects from one assistant. Set goals,
-draft blueprints, submit Requests and follow progress. Connect your own Keelen
-account and choose the projects it can access. Start with a progress check, then
-ask for a supported management change. Blueprint imports are optional and need
-their own approval in Keelen Settings. Keelen performs the engineering under each project's settings.
+Submit a brief to your public and private Keelen projects, make a supported
+goal change and return to the same work for current records and owner decisions.
+One eligible project is enough. Connect your own Keelen account and choose the
+projects it can access. Blueprint imports are optional and need their own
+approval in Keelen Settings. Keelen performs engineering under each project's settings.
 This release runs when you ask; it includes no scheduled routines.
 
-**Published September 8, 2026.** Open
-[Keelen Portfolio Manager](https://x.ai/bot/iCqviUzbFmWEKAdNqkXKm).
+**Published September 10, 2026.** Open
+[Keelen Portfolio Manager 0.4.1](https://x.ai/bot/gvegGULyBESU9brTeOM_r).
 The Portfolio connection is available for existing workspace owners using their
 own accounts and selected-project consent.
+
+The published 0.4.1 instruction package clarifies briefs, charter and budget
+checks, and returning to the same work. It keeps management manual by default.
+The new public template is native version 1; 0.4.1 identifies its instruction
+package. Existing 0.3 copies are not upgraded automatically. Review the actual
+configuration you add.
+
+The 0.4.1 template uses five generic, versioned skill names:
+`portfolio-v041-interview`, `portfolio-v041-charter`,
+`portfolio-v041-blueprint`, `portfolio-v041-manage` and
+`portfolio-v041-report`. The versioned names preserve older skills in the
+account's shared library. They do not select projects or supply an account.
+Older 0.3 copies use unversioned names. The new link above supplies 0.4.1.
 
 Third-party assistant template built by Keelen. The assistant platform does not
 create, sponsor, endorse or operate this template. Review the full configuration
@@ -33,8 +46,8 @@ covers the template, not customer data or Keelen's private source repository.
   that provider, including information from private projects.
 
 The shared template contains generic instructions and five skills:
-`portfolio-interview`, `portfolio-charter`, `portfolio-blueprint`,
-`portfolio-manage` and `portfolio-report`. It supplies no connected account,
+`portfolio-v041-interview`, `portfolio-v041-charter`, `portfolio-v041-blueprint`,
+`portfolio-v041-manage` and `portfolio-v041-report`. It supplies no connected account,
 project data, saved working state or routine. A recipient does not need Keelen's
 private repository, Python or a separately installed schema.
 
@@ -85,11 +98,40 @@ does not require starting project execution or buying a new provider plan.
 A suitable connection message is:
 
 > Help me connect my own Keelen account using OAuth at
-> https://keelen.ai/portfolio/mcp. I want to manage my two existing projects,
-> [owner/repository-one] and [owner/repository-two]. Show the consent step, then
+> https://keelen.ai/portfolio/mcp. I want to manage my existing project,
+> [owner/repository]. Show the consent step, then
 > read back which projects are connected. Do not import a plan or start work.
 
-## Check progress, then make one change
+Reconnecting can reuse an existing grant or register a new client, depending
+on the app. Check the actual client ID and selected projects again; do not
+assume an old charter or operation history moved to the new connection. A new
+connection is not a way to reset a limit. Do not revoke old grants blindly.
+
+## Submit a brief and keep the receipts
+
+Start with one eligible project and two distinct tasks, for example:
+
+> For [owner/repository], submit two separate Requests: add an optional note to
+> each reading-list entry, and add title sorting with ascending and descending
+> choices. Check the live charter and existing Requests before writing. Give
+> each accepted Request's full ID and project mapping, then read back its
+> status. Keep execution settings and protections unchanged. Report any refused
+> or pending item explicitly, even if the attention digest is quiet.
+
+The manager checks scope and the live charter before submitting. An old
+goal-only charter may exclude Requests; the owner must review the intended
+permissions through normal consent before dependent work continues. A draft
+brief, an answered approval card or a summary is not an accepted Request.
+Each distinct task should have its own actual Request ID and correct project.
+An identical replay is not new work. Add another selected project when you
+have work for it; two projects are not a prerequisite for using the manager.
+
+Accepted Requests can remain pending. Submitting work may trigger intake on an
+eligible active project even when the development scheduler is off. Review
+the actual lifecycle, provider and execution settings before submitting; a
+paused or archived demonstration is not an engineering delivery example.
+
+## Make a supported change and return
 
 Ask **“What needs my attention across these projects?”** Then ask for the next
 decision and supporting records if the answer is only a summary:
@@ -120,6 +162,29 @@ next” does not bypass the charter, owner decisions or project protections.
 
 Changing a goal is planning work. It is not evidence that code was built, merged,
 deployed or verified. Leave execution paused for a read/goal-only walkthrough.
+
+If a Request asks a real clarification, answer from the intended brief or make
+the required product decision yourself. No question means nothing to answer.
+After a genuine interval, return in the same conversation and ask:
+
+> Read the same Requests and project records again. What changed since the last
+> observation, what is waiting or unknown, and what needs my decision? Include
+> full IDs and observation timestamps. Separate Keelen's recorded work from
+> actions I ask you to perform now. If nothing progressed, say so.
+
+An event can be attributed to your absence only when its timestamp falls within
+that interval. Otherwise it changed between reads at an unknown time. An intake
+indicator such as `spawn` is not a machine-start or delivery receipt. The Bot
+runs when asked; two manual reads do not establish continuous monitoring.
+
+Default limits include eight mutation reservations per rolling 15 minutes and
+two Requests per project per UTC day for the connection principal; live limits
+may differ. A recorded decision and its write each reserve one mutation, so
+four Request pairs can fill the window before a goal edit. Keep the exact
+failure receipt and operation keys. Wait for the stated retry time if one is
+returned; otherwise timing is unknown and admission decides on a later manual
+attempt. Do not reconnect, raise limits, resubmit accepted work or schedule
+automatic retries to get past a stop.
 
 ## Understand the permissions and approval steps
 
@@ -213,24 +278,33 @@ approval/merge access and must not use other connectors to expand its authority.
 Keelen's terminal decision and intent payloads become eligible for compaction
 after 90 days. Live decisions and unresolved actions retain required evidence;
 minimal import receipts and permanent retry protection remain after payload
-removal. Management diagnostics and recovery receipts use structured status,
-identifiers and digests; raw CI excerpts are excluded from those responses and
-receipts. This does not set the assistant provider's conversation retention or
+removal. Management diagnostics and recovery receipts use classifications,
+bounded check/test/file identities, strict GitHub URLs and non-reversible
+digests; raw CI excerpts are excluded from those responses and receipts, and
+unknown parsing falls back to `unavailable`, not raw text. Terminal recovery
+evidence follows the same 90-day compaction window as decision/intent payloads.
+This does not set the assistant provider's conversation retention or
 promise that deleting one Bot deletes shared resources. Review the provider's
 applicable account and data controls before providing confidential material.
 
-## Manual 0.3 and optional 0.4 management
+## Manual 0.4.1 and optional delegated management
 
-This guide describes the accepted manual 0.3 instruction package and native
+This guide describes the published manual 0.4.1 instruction package and native
 configuration. It contains five generic skills and no routines. Acceptance of
 that flow does not guarantee another account's behavior or security isolation.
 
 The separately merged optional 0.4 management features are documented in the
 [portfolio tool reference](PORTFOLIO.md). Delegated actions require their own
-owner opt-in and deployed tool availability. Copying the 0.3 template, approving
+owner opt-in and deployed tool availability. Copying the template, approving
 OAuth or approving a blueprint does not enable delegated actions. Management
-reads use the selected-project consent and can operate with delegation off.
-This guide does not claim native acceptance of a 0.4 template or scheduled routine.
+reads use the selected-project consent and can operate with delegation off. An
+unattended 0.4 routine additionally requires a non-default
+`mcp:read mcp:write mcp:routine` Portfolio authorization; that principal sees
+only currently delegated projects and can use only digest/context reads plus
+exact server-bound `manage_blocker`. Generic planning mutations and decision-card
+tools remain unavailable to it. If the provider cannot bind that authorization
+to the native routine, keep the routine disabled. This guide does not claim
+native acceptance of a scheduled routine or unattended delegated recovery.
 
 Planning work accepted is different from code merged, deployed or verified.
 Engineering execution follows the project's existing settings and protections.

@@ -115,9 +115,9 @@ handshake revisions, from the same endpoint — no client action is required
 either way. Details in [`clients/generic.md`](clients/generic.md#protocol-support);
 notable contract changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
-[Portfolio Manager 0.3](PORTFOLIO-MANAGER.md) is the manual template for managing
+[Portfolio Manager 0.4.1](PORTFOLIO-MANAGER.md) is the manual template for managing
 selected existing public or private projects. Open the
-[published template](https://x.ai/bot/iCqviUzbFmWEKAdNqkXKm) and follow the guide to
+[published 0.4.1 template](https://x.ai/bot/gvegGULyBESU9brTeOM_r) and follow the guide to
 connect your own account. The separate Portfolio OAuth surface is available.
 The [portfolio reference](PORTFOLIO.md) documents its scoped interface and optional
 0.4 management features. Delegated actions require additional owner opt-in and

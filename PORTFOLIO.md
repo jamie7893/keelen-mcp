@@ -3,7 +3,7 @@
 The portfolio surface at `https://keelen.ai/portfolio/mcp` is the Bot-facing
 tenant-management plane behind the Keelen Portfolio Manager and is available to
 existing workspace owners. Open the
-[published manual 0.3 template](https://x.ai/bot/iCqviUzbFmWEKAdNqkXKm) and use the
+[published manual 0.4.1 template](https://x.ai/bot/gvegGULyBESU9brTeOM_r) and use the
 [recipient guide](PORTFOLIO-MANAGER.md) to connect your own account. This reference
 also describes optional 0.4 management features. Manual reads use selected-project
 consent; delegated actions require the separate owner opt-in described below.
